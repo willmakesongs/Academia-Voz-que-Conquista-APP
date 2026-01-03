@@ -129,7 +129,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
                     }));
 
                 chatSessionRef.current = ai.chats.create({
-                    model: 'gemini-2.0-flash-exp', // Modelo mais rápido e atualizado
+                    model: 'gemini-1.5-flash', // Modelo mais rápido e atualizado
                     config: {
                         systemInstruction: systemPrompt,
                         tools: [{ googleSearch: {} }]
@@ -166,7 +166,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
         if (!chatSessionRef.current) {
             // Tenta recriar se perdeu a sessão por algum motivo
             const ai = new GoogleGenAI({ apiKey: apiKey });
-            chatSessionRef.current = ai.chats.create({ model: 'gemini-2.0-flash-exp' });
+            chatSessionRef.current = ai.chats.create({ model: 'gemini-1.5-flash' });
         }
 
         const userMsg: Message = {
@@ -330,8 +330,8 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
                     >
                         <div
                             className={`max-w-[90%] rounded-2xl p-4 text-sm leading-relaxed relative ${msg.role === 'user'
-                                    ? 'bg-[#1A202C] text-white rounded-tr-none border border-white/10'
-                                    : 'bg-gradient-to-br from-[#2D3748] to-[#1A202C] text-gray-100 rounded-tl-none border border-white/5 shadow-md'
+                                ? 'bg-[#1A202C] text-white rounded-tr-none border border-white/10'
+                                : 'bg-gradient-to-br from-[#2D3748] to-[#1A202C] text-gray-100 rounded-tl-none border border-white/5 shadow-md'
                                 }`}
                         >
                             {/* Renderiza Markdown simplificado (quebras de linha) */}
@@ -421,8 +421,8 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
                         onClick={handleSendMessage}
                         disabled={!inputText.trim() || isTyping}
                         className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${inputText.trim()
-                                ? 'bg-[#0081FF] text-white shadow-lg transform active:scale-95'
-                                : 'bg-white/5 text-gray-600'
+                            ? 'bg-[#0081FF] text-white shadow-lg transform active:scale-95'
+                            : 'bg-white/5 text-gray-600'
                             }`}
                     >
                         <span className="material-symbols-rounded">send</span>
