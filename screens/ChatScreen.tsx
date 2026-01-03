@@ -122,16 +122,18 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
             `;
 
                 const model = genAI.getGenerativeModel({
-                    model: "gemini-pro",
+                    model: "gemini-1.5-flash",
                     systemInstruction: systemPrompt
                 });
 
                 const history = messages
-                    .filter(m => m.id !== 'welcome' && !m.text.includes("Minha conexão falhou"))
+                    .filter(m => m.id !== 'welcome' && !m.text.includes("Minha conexão falhou") && !m.text.includes("Erro Técnico"))
                     .map(m => ({
                         role: m.role,
                         parts: [{ text: m.text }]
                     }));
+
+                console.log("Iniciando chat com histórico:", history.length);
 
                 chatSessionRef.current = model.startChat({
                     history: history
@@ -186,7 +188,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
             `;
 
             const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: "gemini-pro", systemInstruction: systemPrompt });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
             chatSessionRef.current = model.startChat({});
         }
 
@@ -242,8 +244,13 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
         } catch (error: any) {
             console.error("Erro no chat:", error);
 
+            // Log mais detalhado do erro
+            const errorMessage = error?.message || String(error);
+            const errorDetails = JSON.stringify(error, Object.getOwnPropertyNames(error));
+            console.log("Detalhes do erro:", errorDetails);
+
             // Se erro for de autenticação, pede a chave novamente
-            if (error.toString().includes('400') || error.toString().includes('API key')) {
+            if (errorMessage.includes('400') || errorMessage.includes('API key') || errorMessage.includes('permission denied')) {
                 localStorage.removeItem('gemini_api_key');
                 setApiKey(null);
                 setShowConfig(true);
@@ -254,7 +261,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
                 return newMsgs.filter(m => m.id !== botMsgId).concat({
                     id: Date.now().toString(),
                     role: 'model',
-                    text: "⚠️ Erro Técnico: " + ((error as any).message || String(error)) + "\n(Por favor, tire um print desta mensagem e me mande!)"
+                    text: `⚠️ Ops, tivemos um problema!\n\nErro: ${errorMessage}\n\nTente novamente ou verifique sua conexão.`
                 });
             });
             chatSessionRef.current = null;
