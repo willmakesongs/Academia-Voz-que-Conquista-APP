@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useAuth } from '../contexts/AuthContext';
 import { MODULES, LORENA_AVATAR_URL } from '../constants';
 
@@ -50,7 +50,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
     const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
-    const chatSessionRef = useRef<Chat | null>(null);
+    const chatSessionRef = useRef<any | null>(null);
 
     // Verifica e carrega a Chave de API
     useEffect(() => {
@@ -99,7 +99,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
 
         const initChat = async () => {
             try {
-                const ai = new GoogleGenAI({ apiKey: apiKey });
+                const genAI = new GoogleGenerativeAI(apiKey);
 
                 const systemPrompt = `
             Você é a **Lorena Pimentel IA**, a mentora virtual da academia "Voz Que Conquista".
@@ -121,6 +121,11 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
             Termine com uma pergunta motivadora ou ação prática.
             `;
 
+                const model = genAI.getGenerativeModel({
+                    model: "gemini-1.5-flash",
+                    systemInstruction: systemPrompt
+                });
+
                 const history = messages
                     .filter(m => m.id !== 'welcome' && !m.text.includes("Minha conexão falhou"))
                     .map(m => ({
@@ -128,12 +133,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
                         parts: [{ text: m.text }]
                     }));
 
-                chatSessionRef.current = ai.chats.create({
-                    model: 'gemini-1.5-flash', // Modelo mais rápido e atualizado
-                    config: {
-                        systemInstruction: systemPrompt,
-                        tools: [{ googleSearch: {} }]
-                    },
+                chatSessionRef.current = model.startChat({
                     history: history
                 });
 
@@ -165,8 +165,9 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
 
         if (!chatSessionRef.current) {
             // Tenta recriar se perdeu a sessão por algum motivo
-            const ai = new GoogleGenAI({ apiKey: apiKey });
-            chatSessionRef.current = ai.chats.create({ model: 'gemini-1.5-flash' });
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            chatSessionRef.current = model.startChat({});
         }
 
         const userMsg: Message = {
@@ -190,13 +191,13 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
 
         try {
             if (chatSessionRef.current) {
-                const resultStream = await chatSessionRef.current.sendMessageStream({ message: userMsg.text });
+                const result = await chatSessionRef.current.sendMessageStream(userMsg.text);
 
                 let accumulatedText = '';
                 let finalMetadata = null;
 
-                for await (const chunk of resultStream) {
-                    const chunkText = chunk.text || '';
+                for await (const chunk of result.stream) {
+                    const chunkText = chunk.text();
                     accumulatedText += chunkText;
 
                     if (chunk.groundingMetadata) {
