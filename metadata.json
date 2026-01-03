@@ -1,0 +1,7 @@
+{
+  "name": "Vocalizes",
+  "description": "Plataforma completa para treinamento vocal e gestão de aulas de música, conectando professores e alunos.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
