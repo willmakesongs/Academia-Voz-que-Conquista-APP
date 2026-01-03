@@ -234,7 +234,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
                 return newMsgs.filter(m => m.id !== botMsgId).concat({
                     id: Date.now().toString(),
                     role: 'model',
-                    text: "Ops! Minha conexão falhou. Verifique sua chave de API ou tente novamente. 🔌"
+                    text: "⚠️ Erro Técnico: " + ((error as any).message || String(error)) + "\n(Por favor, tire um print desta mensagem e me mande!)"
                 });
             });
             chatSessionRef.current = null;
