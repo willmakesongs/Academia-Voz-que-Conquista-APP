@@ -122,7 +122,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
             `;
 
                 const model = genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash",
+                    model: "gemini-1.5-flash-001",
                     systemInstruction: systemPrompt
                 });
 
@@ -166,7 +166,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
         if (!chatSessionRef.current) {
             // Tenta recriar se perdeu a sessão por algum motivo
             const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
             chatSessionRef.current = model.startChat({});
         }
 
