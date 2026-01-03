@@ -121,8 +121,9 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
             Termine com uma pergunta motivadora ou ação prática.
             `;
 
+                // Tenta usar a versão específica 001 que é mais estável
                 const model = genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash",
+                    model: "gemini-1.5-flash-001",
                     systemInstruction: systemPrompt
                 });
 
@@ -188,7 +189,7 @@ export const ChatScreen: React.FC<Props> = ({ onBack }) => {
             `;
 
             const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001", systemInstruction: systemPrompt });
             chatSessionRef.current = model.startChat({});
         }
 
